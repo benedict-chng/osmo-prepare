@@ -5,6 +5,7 @@
 
 ## Requirements
 - Python 3.11 (or later) is required to run this project. The script has been tested and works with Python 3.11.
+- FFmpeg 4.4.x required to join video fragments.
 
 ## Installation
 1. **Ensure Python is installed**: Download and install Python 3.11 from the [official website](https://www.python.org/downloads/), if you haven't already.
