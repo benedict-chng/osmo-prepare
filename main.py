@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import subprocess
 
@@ -43,8 +44,14 @@ def copy_files_to_processed(media_dir: str, dest_dir: str, filenames: list[str])
 
 
 def group_related_videos(video_filenames: list[str]) -> dict[str, list[str]]:
+    unchunked_filename_pattern = r"^DJI_\d{4}\.MP4$"
+
     grouped = {}
     for filename in video_filenames:
+
+        if (re.match(unchunked_filename_pattern, filename)):
+            continue
+
         group_name = filename[:8]
 
         grouped_filenames: list[str] = None
@@ -95,18 +102,18 @@ def delete_input_files(processed_dir: str, input_files: list[str]):
     for filename in input_files:
         os.remove(os.path.join(processed_dir, filename))
 
+if __name__ == "__main__":
+    media_dir = '/media/benedict/disk/DCIM/100MEDIA'
+    processed_media_dir = './processed'
 
-media_dir = '/media/benedict/disk/DCIM/100MEDIA'
-processed_media_dir = './processed'
+    clear_processed_dir(processed_media_dir)
+    video_filenames = list_filenames(media_dir)
+    copy_files_to_processed(media_dir, processed_media_dir, video_filenames)
 
-clear_processed_dir(processed_media_dir)
-video_filenames = list_filenames(media_dir)
-copy_files_to_processed(media_dir, processed_media_dir, video_filenames)
+    video_filenames = list_filenames(processed_media_dir)
+    grouped_filenames = group_related_videos(video_filenames)
 
-video_filenames = list_filenames(processed_media_dir)
-grouped_filenames = group_related_videos(video_filenames)
-
-for filename in grouped_filenames:
-    create_input_parameter_file(processed_media_dir, grouped_filenames[filename])
-    join_videofile(processed_media_dir, filename)
-    delete_input_files(processed_media_dir, grouped_filenames[filename])
+    for filename in grouped_filenames:
+        create_input_parameter_file(processed_media_dir, grouped_filenames[filename])
+        join_videofile(processed_media_dir, filename)
+        delete_input_files(processed_media_dir, grouped_filenames[filename])
