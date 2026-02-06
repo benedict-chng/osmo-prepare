@@ -1,5 +1,5 @@
 import sys
-from main import create_input_parameter_file, join_videofile
+from .main import create_input_parameter_file, join_videofile
 
 
 def get_filename_list() -> list[str]:
@@ -9,15 +9,14 @@ def get_filename_list() -> list[str]:
     return filenames
 
 
-if __name__ == '__main__':
-
-    if (len(sys.argv) < 3):
-        print('Join 2 or more video files together')
-        print('Usage:')
-        print('    python join.py [dest] [file1] [file2] ...')
+def main():
+    if len(sys.argv) < 3:
+        print("Join 2 or more video files together")
+        print("Usage:")
+        print("    osmo-join [dest] [file1] [file2] ...")
         sys.exit(1)
 
-    processed_dir = './processed'
+    processed_dir = "./processed"
 
     filename_list = get_filename_list()
     output_filename = sys.argv[1]
@@ -26,5 +25,8 @@ if __name__ == '__main__':
 
     join_videofile(processed_dir=processed_dir, output_filename=output_filename)
 
-    print('All done!\n')
+    print("All done!\n")
 
+
+if __name__ == "__main__":
+    main()

@@ -20,7 +20,9 @@ def list_filenames(directory: str) -> list[str]:
 
 
 def is_video_file(directory: str, filename: str) -> bool:
-    return os.path.isfile(os.path.join(directory, filename)) and filename.upper().endswith('.MP4')
+    return os.path.isfile(
+        os.path.join(directory, filename)
+    ) and filename.upper().endswith(".MP4")
 
 
 def clear_processed_dir(processed_media_dir: str):
@@ -32,7 +34,7 @@ def clear_processed_dir(processed_media_dir: str):
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)  # Remove the directory and its contents
         except Exception as e:
-            print(f'Failed to delete {file_path}. Reason: {e}')
+            print(f"Failed to delete {file_path}. Reason: {e}")
 
 
 def copy_files_to_processed(media_dir: str, dest_dir: str, filenames: list[str]):
@@ -48,14 +50,13 @@ def group_related_videos(video_filenames: list[str]) -> dict[str, list[str]]:
 
     grouped = {}
     for filename in video_filenames:
-
-        if (re.match(unchunked_filename_pattern, filename)):
+        if re.match(unchunked_filename_pattern, filename):
             continue
 
         group_name = filename[:8]
 
         grouped_filenames: list[str] = None
-        if (group_name in grouped):
+        if group_name in grouped:
             grouped_filenames: list[str] = grouped[group_name]
         else:
             grouped_filenames: list[str] = []
@@ -68,7 +69,7 @@ def group_related_videos(video_filenames: list[str]) -> dict[str, list[str]]:
 
 
 def create_input_parameter_file(processed_dir: str, filenames: list[str]):
-    with open(os.path.join(processed_dir, "filelist.txt"), 'w') as file:
+    with open(os.path.join(processed_dir, "filelist.txt"), "w") as file:
         for filename in filenames:
             line = "file '{fname}'\n".format(fname=filename)
             file.write(line)
@@ -76,16 +77,22 @@ def create_input_parameter_file(processed_dir: str, filenames: list[str]):
 
 def join_videofile(processed_dir: str, output_filename: str):
     command = [
-        'ffmpeg',
-        '-f', 'concat',
-        '-safe', '0',
-        '-i', os.path.join(processed_dir, "filelist.txt"),
-        '-c', 'copy',
-        os.path.join(processed_dir, output_filename + '.MP4')
+        "ffmpeg",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        os.path.join(processed_dir, "filelist.txt"),
+        "-c",
+        "copy",
+        os.path.join(processed_dir, output_filename + ".MP4"),
     ]
     try:
         # Run the command
-        result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(
+            command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         # Print the output
         print("Command output:", result.stdout.decode())
@@ -102,9 +109,10 @@ def delete_input_files(processed_dir: str, input_files: list[str]):
     for filename in input_files:
         os.remove(os.path.join(processed_dir, filename))
 
-if __name__ == "__main__":
-    media_dir = '/media/benedict/disk/DCIM/100MEDIA'
-    processed_media_dir = './processed'
+
+def main():
+    media_dir = "/media/benedict/disk/DCIM/100MEDIA"
+    processed_media_dir = "./processed"
 
     clear_processed_dir(processed_media_dir)
     video_filenames = list_filenames(media_dir)
@@ -117,3 +125,7 @@ if __name__ == "__main__":
         create_input_parameter_file(processed_media_dir, grouped_filenames[filename])
         join_videofile(processed_media_dir, filename)
         delete_input_files(processed_media_dir, grouped_filenames[filename])
+
+
+if __name__ == "__main__":
+    main()
